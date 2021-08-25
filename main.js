@@ -1,5 +1,5 @@
 let fetch = require("node-fetch"),
-  xmldom = require("@xmldom/xmldom");
+  jsdom = require("jsdom");
 // Driver for the sub-sraper. Should be run in a browser extension
 // like Greasemonkey or Tampermonkey.
 
@@ -20,10 +20,18 @@ const excludedTitles = new Set([
     "Watch later",
     "Liked videos",
   ]),
-  directChannelPrefix = "/channel/",
+  directChannelPrefix = "channel",
   altChannelURLPrefixes = new Set(["c", "user"]);
 
-function scrapeSubscriptions() {
+/**
+ * Main function that scrapes the subscription for a YouTube account.
+ * Assumes that the user will be running this script on the YouTube homepage
+ * after expanding the collapsable list of subscriptions located in the sidebar.
+ *
+ * @return {Array} - an array of objects of the type {channelID: string, channelName: string}
+ *
+ */
+async function scrapeSubscriptions() {
   let subscriptions = [],
     subscriptionHTMLElements = document.querySelectorAll(
       "div#items ytd-guide-entry-renderer a#endpoint[href]"
@@ -35,10 +43,12 @@ function scrapeSubscriptions() {
     }
 
     let channelName = subscriptionHTMLElement.title,
-      channelID = getChannelID(subscriptionHTMLElement.href);
+      channelID = await getChannelID(subscriptionHTMLElement.href);
+
+    subscriptions.push({ name: channelName, id: channelID });
   }
 
-  return;
+  return subscriptions;
 }
 
 /**
@@ -48,7 +58,7 @@ function scrapeSubscriptions() {
  * @return {string} - the channel ID
  *
  */
-async function getChannelID(channelURL) {
+function getChannelID(channelURL) {
   const regex =
       /https:\/\/www.youtube.com\/(?<prefix>\w+)\/(?<channelName>\w+)/,
     match = channelURL.match(regex);
@@ -71,9 +81,7 @@ async function getChannelID(channelURL) {
   if (prefix == directChannelPrefix) {
     return channelName;
   } else if (altChannelURLPrefixes.has(prefix)) {
-    fetchChannelID(channelURL);
-    // console.log(await fetchChannelID(channelURL));
-    // return fetchChannelID(channelURL);
+    return fetchChannelID(channelURL);
   } else {
     console.error(
       "Unexpected channel URL prefix while processing " + channelURL
@@ -88,20 +96,19 @@ async function getChannelID(channelURL) {
  * fetches the HTML of a channel to retrieve the channel ID.
  *
  * @param {string} channelURL - the URL of a YouTube channel
- * @return {string} - the channel ID
+ * @return {Promise} - a Promise of the channel ID
  *
  */
 async function fetchChannelID(channelURL) {
-  let channelPageSource = await fetch(channelURL).then((response) =>
-    response.text()
-  );
+  return fetch(channelURL)
+    .then((response) => response.text())
+    .then((channelPageSource) => {
+      let doc = new jsdom.JSDOM(channelPageSource).window.document;
 
-  console.log(channelPageSource);
-
-  let parser = new xmldom.DOMParser(),
-    doc = parser.parseFromString(channelPageSource, "text/html");
-
-  console.log(doc.querySelector("meta[itemprop='channelId']"));
+      return doc
+        .querySelector("meta[itemprop='channelId']")
+        .getAttribute("content");
+    });
 }
 
 getChannelID("https://www.youtube.com/user/NovaraMedia");
