@@ -116,7 +116,8 @@ async function fetchChannelID(channelURL) {
   return fetch(channelURL)
     .then((response) => response.text())
     .then((channelPageSource) => {
-      let doc = new jsdom.JSDOM(channelPageSource).window.document;
+      let doc = new DOMParser(),
+        doc = parser.parseFromString(channelPageSource, "text/html");
 
       return doc
         .querySelector("meta[itemprop='channelId']")
