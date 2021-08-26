@@ -138,7 +138,7 @@ function main() {
 
   const makeChannelIDObj = R.pipe(
     R.pick("link"),
-    R.apply(getChannelID),
+    getChannelID,
     R.objOf("channelID")
   );
 
