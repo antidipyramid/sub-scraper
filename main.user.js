@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         New Userscript
 // @namespace    http://tampermonkey.net/
-// @version      0.5
+// @version      0.6
 // @description  try to take over the world!
 // @author       You
 // @match        https://www.youtube.com/*
@@ -15,55 +15,8 @@
 // Driver for the sub-sraper. Should be run in a browser extension
 // like Greasemonkey or Tampermonkey.
 
-/**
- * Scrapes a user's subscriptions on YouTube. User must be logged in.
- *
- * @return {Array[string]} - a list of URLs that point to the RSS feeds of
- * the user's YouTube subscriptions.
- */
-
-const excludedTitles = new Set([
-    "Home",
-    "Explore",
-    "Subscriptions",
-    "Library",
-    "History",
-    "Your videos",
-    "Watch later",
-    "Liked videos",
-  ]),
-  directChannelPrefix = "channel",
+const directChannelPrefix = "channel",
   altChannelURLPrefixes = new Set(["c", "user"]);
-
-/**
- * Main function that scrapes the subscription for a YouTube account.
- * Assumes that the user will be running this script on the YouTube homepage
- * after expanding the collapsable list of subscriptions located in the sidebar.
- *
- * @return {Array} - an array of objects of the type {channelID: string, channelName: string}
- *
- */
-async function scrapeSubscriptions() {
-  let subscriptions = [],
-    subscriptionHTMLElements = document.querySelectorAll(
-      "div#items ytd-guide-entry-renderer a#endpoint[href]"
-    );
-
-  subscriptions = subscriptionHTMLElements.map();
-
-  for (const subscriptionHTMLElement of subscriptionHTMLElements) {
-    if (excludedTitles.has(subscriptionHTMLElement.title)) {
-      continue;
-    }
-
-    let channelName = subscriptionHTMLElement.title,
-      channelID = await getChannelID(subscriptionHTMLElement.href);
-
-    subscriptions.push({ name: channelName, id: channelID });
-  }
-
-  return subscriptions;
-}
 
 /**
  * Fetches the channel ID given the URL of a YouTube channel.
@@ -87,18 +40,18 @@ function getChannelID(channelURL) {
       console.error(e + " while processing " + channelURL);
     }
 
-    return "";
+    return Promise.resolve("");
   }
 
   if (prefix == directChannelPrefix) {
-    return channelName;
+    return Promise.resolve(channelName);
   } else if (altChannelURLPrefixes.has(prefix)) {
     return fetchChannelID(channelURL);
   } else {
     console.error(
       "Unexpected channel URL prefix while processing " + channelURL
     );
-    return "";
+    return Promise.resolve("");
   }
 }
 
@@ -142,16 +95,19 @@ function main() {
     R.andThen(R.objOf("channelID"))
   );
 
-  const addChannelID = R.pipe(
-    R.juxt([makeChannelIDObj, R.identity]),
-    R.mergeAll
-  );
+  const channelNamesAndLinks = R.map(
+      getNamesAndLinks,
+      subscriptionHTMLElements
+    ),
+    channelIDList = R.map(makeChannelIDObj, channelNamesAndLinks);
 
-  R.pipe(
-    R.map(getNamesAndLinks),
-    R.map(addChannelID),
-    console.log
-  )(subscriptionHTMLElements);
+  Promise.all(channelIDList).then((channelIDs) => {
+    R.pipe(
+      R.zip(channelNamesAndLinks),
+      R.map(R.mergeAll),
+      console.log
+    )(channelIDs);
+  });
 }
 
 GM_registerMenuCommand("Run", main, "x");
