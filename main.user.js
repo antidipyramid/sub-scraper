@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         New Userscript
 // @namespace    http://tampermonkey.net/
-// @version      0.4
+// @version      0.5
 // @description  try to take over the world!
 // @author       You
 // @match        https://www.youtube.com/*
@@ -77,8 +77,6 @@ function getChannelID(channelURL) {
       /https:\/\/www.youtube.com\/(?<prefix>\w+)\/(?<channelName>\w+)/,
     match = channelURL.match(regex);
 
-  console.log(match.groups);
-
   let prefix, channelName;
   try {
     [prefix, channelName] = [match.groups.prefix, match.groups.channelName];
@@ -138,7 +136,20 @@ function main() {
     "div#sections ytd-guide-section-renderer:nth-child(2) a#endpoint[href]"
   );
 
-  R.pipe(R.map(getNamesAndLinks), console.log)(subscriptionHTMLElements);
+  const objectify = (key, value) => {
+    key: value;
+  };
+
+  R.pipe(
+    R.map(getNamesAndLinks),
+    R.map(
+      R.mergeAll(
+        R.pick(["channelName"]),
+        R.map(objectify, R.map(getChannelID, R.prop("channelLink")))
+      )
+    ),
+    console.log
+  )(subscriptionHTMLElements);
 }
 
 GM_registerMenuCommand("Run", main, "x");
