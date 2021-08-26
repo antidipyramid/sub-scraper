@@ -7,8 +7,8 @@
 // @match        https://github.com/antidipyramid/sub-scraper/blob/scrape-subscriptions/main.js
 // @icon         https://www.google.com/s2/favicons?domain=github.com
 // @require      https://cdn.jsdelivr.net/npm/ramda@0.25.0/dist/ramda.min.js
+// @downloadURL  https://github.com/antidipyramid/sub-scraper/raw/scrape-subscriptions/main.user.js
 // @grant        GM_registerMenuCommand
-// @grant        GM.registerMenuCommand
 // ==/UserScript==
 
 // Driver for the sub-sraper. Should be run in a browser extension
