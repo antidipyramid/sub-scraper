@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         New Userscript
 // @namespace    http://tampermonkey.net/
-// @version      0.2
+// @version      0.3
 // @description  try to take over the world!
 // @author       You
 // @match        https://www.youtube.com/*
@@ -117,7 +117,7 @@ async function fetchChannelID(channelURL) {
   return fetch(channelURL)
     .then((response) => response.text())
     .then((channelPageSource) => {
-      let doc = new DOMParser(),
+      let parser = new DOMParser(),
         doc = parser.parseFromString(channelPageSource, "text/html");
 
       return doc
