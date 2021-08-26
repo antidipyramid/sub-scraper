@@ -136,18 +136,20 @@ function main() {
     "div#sections ytd-guide-section-renderer:nth-child(2) a#endpoint[href]"
   );
 
-  const objectify = (key, value) => {
-    key: value;
-  };
+  const makeChannelIDObj = R.pipe(
+    R.pick("link"),
+    R.apply(getChannelID),
+    R.objOf("channelID")
+  );
+
+  const addChannelID = R.pipe(
+    R.juxt([makeChannelIDObj, R.identity]),
+    R.mergeAll
+  );
 
   R.pipe(
     R.map(getNamesAndLinks),
-    R.map(
-      R.mergeAll(
-        R.pick(["channelName"]),
-        R.map(objectify, R.map(getChannelID, R.prop("channelLink")))
-      )
-    ),
+    R.map(addChannelID),
     console.log
   )(subscriptionHTMLElements);
 }
