@@ -1,5 +1,16 @@
-let fetch = require("node-fetch"),
-  jsdom = require("jsdom");
+// ==UserScript==
+// @name         New Userscript
+// @namespace    http://tampermonkey.net/
+// @version      0.1
+// @description  try to take over the world!
+// @author       You
+// @match        https://github.com/antidipyramid/sub-scraper/blob/scrape-subscriptions/main.js
+// @icon         https://www.google.com/s2/favicons?domain=github.com
+// @require      https://cdn.jsdelivr.net/npm/ramda@0.25.0/dist/ramda.min.js
+// @grant        GM_registerMenuCommand
+// @grant        GM.registerMenuCommand
+// ==/UserScript==
+
 // Driver for the sub-sraper. Should be run in a browser extension
 // like Greasemonkey or Tampermonkey.
 
@@ -36,6 +47,8 @@ async function scrapeSubscriptions() {
     subscriptionHTMLElements = document.querySelectorAll(
       "div#items ytd-guide-entry-renderer a#endpoint[href]"
     );
+
+  subscriptions = subscriptionHTMLElements.map();
 
   for (const subscriptionHTMLElement of subscriptionHTMLElements) {
     if (excludedTitles.has(subscriptionHTMLElement.title)) {
@@ -109,6 +122,25 @@ async function fetchChannelID(channelURL) {
         .querySelector("meta[itemprop='channelId']")
         .getAttribute("content");
     });
+}
+
+function getNamesAndLinks(subscriptionHTMLElement) {
+  return {
+    channelName: subscriptionHTMLElement.title,
+    channelLink: subscriptionHTMLElement.href,
+  };
+}
+
+function main() {
+  const subscriptionHTMLElements = document.querySelectorAll(
+    "div#items ytd-guide-entry-renderer a#endpoint[href]"
+  );
+
+  R.pipe(R.map(getNamesAndLinks), console.log)(subscriptionHTMLElements);
+}
+
+if (GM.registerMenuCommand) {
+  GM.registerMenuCommand("Run", main, "x");
 }
 
 getChannelID("https://www.youtube.com/user/NovaraMedia");
