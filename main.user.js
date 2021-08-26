@@ -4,7 +4,7 @@
 // @version      0.1
 // @description  try to take over the world!
 // @author       You
-// @match        https://github.com/antidipyramid/sub-scraper/blob/scrape-subscriptions/main.js
+// @match        https://www.youtube.com/*
 // @icon         https://www.google.com/s2/favicons?domain=github.com
 // @require      https://cdn.jsdelivr.net/npm/ramda@0.25.0/dist/ramda.min.js
 // @downloadURL  https://github.com/antidipyramid/sub-scraper/raw/scrape-subscriptions/main.user.js
