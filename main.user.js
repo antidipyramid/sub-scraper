@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         New Userscript
 // @namespace    http://tampermonkey.net/
-// @version      0.3
+// @version      0.4
 // @description  try to take over the world!
 // @author       You
 // @match        https://www.youtube.com/*
@@ -141,8 +141,6 @@ function main() {
   R.pipe(R.map(getNamesAndLinks), console.log)(subscriptionHTMLElements);
 }
 
-if (GM.registerMenuCommand) {
-  GM.registerMenuCommand("Run", main, "x");
-}
+GM_registerMenuCommand("Run", main, "x");
 
 getChannelID("https://www.youtube.com/user/NovaraMedia");
