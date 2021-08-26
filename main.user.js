@@ -134,7 +134,7 @@ function getNamesAndLinks(subscriptionHTMLElement) {
 
 function main() {
   const subscriptionHTMLElements = document.querySelectorAll(
-    "div#items ytd-guide-entry-renderer a#endpoint[href]"
+    "div#sections ytd-guide-section-renderer:nth-child(2) a#endpoint[href]"
   );
 
   R.pipe(R.map(getNamesAndLinks), console.log)(subscriptionHTMLElements);
