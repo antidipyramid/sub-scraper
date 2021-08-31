@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name         New Userscript
+// @name         Youtube Subscription Exporter
 // @namespace    http://tampermonkey.net/
 // @version      0.7
 // @description  try to take over the world!
@@ -219,6 +219,6 @@ function main() {
   });
 }
 
-GM_registerMenuCommand("Run", main, "x");
+GM_registerMenuCommand("Export RSS (OPML)", main, "x");
 
 getChannelID("https://www.youtube.com/user/NovaraMedia");
