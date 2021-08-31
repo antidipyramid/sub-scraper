@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Youtube Subscription Exporter
 // @namespace    http://tampermonkey.net/
-// @version      0.7
+// @version      0.8
 // @description  try to take over the world!
 // @author       antidipyramid
 // @match        https://www.youtube.com/*
@@ -220,5 +220,3 @@ function main() {
 }
 
 GM_registerMenuCommand("Export RSS (OPML)", main, "x");
-
-getChannelID("https://www.youtube.com/user/NovaraMedia");
