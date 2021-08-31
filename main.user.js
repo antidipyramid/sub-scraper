@@ -1,12 +1,13 @@
 // ==UserScript==
 // @name         Youtube Subscription Exporter
 // @namespace    http://tampermonkey.net/
-// @version      0.8
+// @version      0.9
 // @description  try to take over the world!
 // @author       antidipyramid
 // @match        https://www.youtube.com/*
 // @icon         https://www.google.com/s2/favicons?domain=github.com
 // @require      https://cdnjs.cloudflare.com/ajax/libs/ramda/0.27.1/ramda.min.js
+// @require      https://unpkg.com/micromodal/dist/micromodal.min.js
 // @updateURL    https://github.com/antidipyramid/sub-scraper/raw/main/main.user.js
 // @downloadURL  https://github.com/antidipyramid/sub-scraper/raw/scrape-subscriptions/main.user.js
 // @grant        GM_registerMenuCommand
@@ -185,7 +186,51 @@ function promptDownload(xmlDocument) {
   pom.click();
 }
 
+/**
+ * Creates modal to display logging information to user.
+ *
+ * @param {string} modalID - the ID attribute for the modal
+ * @return {HTMLElement} the modal
+ */
+function makeModal(modalID) {
+  var modalContainer = document.createElement("div"),
+    overlay = document.createElement("div"),
+    dialog = document.createElement("div"),
+    header = document.createElement("header"),
+    modalContent = document.createElement("div");
+
+  modalContainer.setAttribute("id", modalID);
+  modalContainer.setAttribute("aria-hidden", true);
+
+  overlay.setAttribute("tabindex", -1);
+  overlay.setAttribute("data-micromodal-close", "");
+  modalContainer.appendChild(overlay);
+
+  dialog.setAttribute("role", "dialog");
+  dialog.setAttribute("aria-modal", true);
+  dialog.setAttribute("aria-labelledby", "modal-1-title");
+  modalContainer.appendChild(dialog);
+
+  var heading = document.createElement("h2");
+  heading.setAttribute("id", "modal-1-title");
+  var closeButton = ducoment.createElement("button");
+  closeButton.setAttribute("aria-label", "Close modal");
+  closeButton.setAttribute("data-micromodal-close", "");
+  header.appendChild(heading);
+  header.appendChild(closeButton);
+  dialog.appendChild(header);
+
+  modalContent.setAttribute("id", "modal-1-content");
+  modalContent.innerHTML = "Content!";
+  dialog.appendChild(modalContent);
+
+  return modalContainer;
+}
+
 function main() {
+  const modal = makeModal("modal-1");
+  MicroModal.show("modal-1");
+
   const subscriptionHTMLElements = document.querySelectorAll(
     "div#sections ytd-guide-section-renderer:nth-child(2) a#endpoint[href]"
   );
