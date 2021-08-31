@@ -124,7 +124,8 @@ function addChannelRSSLink(channelInfo) {
   return R.assoc(
     "channelRSSLink",
     "https://www.youtube.com/feeds/videos.xml?channel_id=" +
-      channelInfo.channelID
+      channelInfo.channelID,
+    channelInfo
   );
 }
 
@@ -139,7 +140,7 @@ function addChannelRSSLink(channelInfo) {
 function addChannelXMLString(channelInfo) {
   return R.assoc(
     "channelXMLString",
-    "<outline xmlUrl='" - channelInfo.channelRSSLink + "'/>",
+    "<outline xmlUrl='" + channelInfo.channelRSSLink + "'/>",
     channelInfo
   );
 }
