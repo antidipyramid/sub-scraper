@@ -28,7 +28,7 @@ const directChannelPrefix = "channel",
  */
 function getChannelID(channelURL) {
   const regex =
-      /https:\/\/www.youtube.com\/(?<prefix>\w+)\/(?<channelName>\w+)/,
+      /https:\/\/www.youtube.com\/(?<prefix>\w+)\/*(?<channelName>[\w-]*)/,
     match = channelURL.match(regex);
 
   let prefix, channelName;
@@ -47,6 +47,8 @@ function getChannelID(channelURL) {
   if (prefix == directChannelPrefix) {
     return Promise.resolve(channelName);
   } else if (altChannelURLPrefixes.has(prefix)) {
+    return fetchChannelID(channelURL);
+  } else if (channelName === "") {
     return fetchChannelID(channelURL);
   } else {
     console.error(
