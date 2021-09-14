@@ -14,6 +14,8 @@ Each YouTube channel has an associated RSS feed. YouTube used to offer users the
 ## Technologies
 I used this as an opportunity to explore functional programming, so the script heavily utilizes the Ramda.js library.
 
+The modal is generated with Micromodal.js.
+
 ## How It Works
 ![Youtube Screenshot](images/youtube_screenshot.png)
 1. On any YouTube page, when the user is logged in, there is an collapsible "drawer" on the left-hand side of the page (outlined in red).
